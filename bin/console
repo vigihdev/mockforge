@@ -1,0 +1,16 @@
+#!/usr/bin/env php
+<?php
+// console
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use Symfony\Component\Console\Application;
+use Vigihdev\MockForge\Command\Mock\Wp\UserWpMockCommand;
+
+// Application
+$app = new Application();
+
+// Block Mock Wp
+$app->add(new UserWpMockCommand());
+
+$app->run();
