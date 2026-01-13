@@ -12,5 +12,11 @@ jobs:
         with:
           php-version: "8.1"
 
+      - name: Configure composer auth
+        run: |
+          composer config --global satis.id \
+            "${{ secrets.SATIS_USER }}" \
+            "${{ secrets.SATIS_PASSWORD }}"
+
       - run: composer install --no-interaction --prefer-dist
       - run: composer test
