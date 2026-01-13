@@ -10,7 +10,7 @@ final class FileException extends MockForgeException
     public static function exist(string $filepath): self
     {
         return new self(
-            message: sprintf("File '%s' already exist", $filepath),
+            message: sprintf("File %s already exists", $filepath),
             context: [
                 'filepath' => $filepath,
             ],
@@ -181,8 +181,8 @@ final class FileException extends MockForgeException
         return new self(
             message: sprintf(
                 'File size exceeds maximum allowed: %s (max %s)',
-                size_format($actualSize),
-                size_format($maxSize)
+                $actualSize,
+                $maxSize
             ),
             context: [
                 'filepath' => $filepath,
