@@ -1,6 +1,6 @@
 ## Mockforge
 
-![Tests](https://github.com/vigihdev/mockforge/actions/workflows/tests.yml/badge.svg)
+![Push](https://github.com/vigihdev/mockforge/actions/workflows/push.yml/badge.svg)
 ![PHP Version](https://img.shields.io/badge/PHP-8.1%2B-blue.svg)
 
 - A tool for generating mock data for WordPress entities (posts, pages, custom post types, taxonomies, terms, users, comments) efficiently via the command line.
