@@ -5,12 +5,14 @@
 require __DIR__ . '/../vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
-use Vigihdev\MockForge\Command\Mock\Wp\UserWpMockCommand;
+use Vigihdev\MockForge\Command\Mock\Wp\{UserWpMockCommand, CategoryWpMockCommand, PostWpMockCommand};
 
 // Application
 $app = new Application();
 
 // Block Mock Wp
 $app->add(new UserWpMockCommand());
+$app->add(new CategoryWpMockCommand());
+$app->add(new PostWpMockCommand());
 
 $app->run();

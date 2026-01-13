@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Vigihdev\MockForge\Fields\Wp;
 
-
 final class PostField
 {
 
