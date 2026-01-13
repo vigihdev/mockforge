@@ -6,12 +6,15 @@ namespace Vigihdev\MockForge\Command\Mock\Wp;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\{InputInterface, InputOption, InputArgument};
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Vigihdev\MockForge\Validators\DirectoryValidator;
+use Symfony\Component\Filesystem\Path;
+use Vigihdev\MockForge\DTOs\Wp\PostWpDto;
+use Vigihdev\MockForge\Faker\Provider\PostWpProvider;
+use Vigihdev\MockForge\Validators\{DirectoryValidator, FileValidator};
+use Vigihdev\Support\Collection;
+use Vigihdev\Support\File;
 
 #[AsCommand(
     name: 'mock:wp-post',
@@ -20,13 +23,19 @@ use Vigihdev\MockForge\Validators\DirectoryValidator;
 final class PostWpMockCommand extends BaseWpCommand
 {
 
+    /**
+     *
+     * @var Collection<PostWpDto>
+     */
+    private Collection $posts;
 
     protected function configure(): void
     {
         $this
-            ->addOption('count', 'c', InputOption::VALUE_OPTIONAL, 'Number of posts to mock', null,)
-            ->addOption('output', 'o', InputOption::VALUE_OPTIONAL, 'Output directory', null,)
-            ->addOption('dry-run', null, InputOption::VALUE_OPTIONAL, 'Dry run', false)
+            ->addOption('count', 'c', InputOption::VALUE_OPTIONAL, 'Number of posts to mock', 10)
+            ->addOption('out', 'o', InputOption::VALUE_REQUIRED, 'Out Filepath to save mock data', null)
+            ->addOption('author-count', 'ac', InputOption::VALUE_REQUIRED, 'Number of unique authors', 10)
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Dry run', null)
             ->setHelp(
                 <<<'HELP'
                     <info>Mock Post and their meta data</info>
@@ -52,17 +61,40 @@ final class PostWpMockCommand extends BaseWpCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+
         $io = new SymfonyStyle($input, $output);
-        $count = $input->getOption('count');
-        if ($count === null) {
-            $count = 10;
+        $this->count = (int) $input->getOption('count');
+        $outFilepath = $input->getOption('out');
+        $authorCount = (int) $input->getOption('author-count');
+        $dryRun = $input->getOption('dry-run');
+
+        if ($outFilepath === null) {
+            $io->error('Out filepath is required');
+            return Command::INVALID;
         }
 
+        $outFilepath = $this->normalizeOutFilepath($outFilepath);
+
         try {
-            DirectoryValidator::validate('')
+            FileValidator::validate($outFilepath)
+                ->mustHaveExtension()
+                ->mustBeExtension('json', 'csv')
+                ->mustBeNotExist();
+
+            $directory = Path::getDirectory($outFilepath);
+            DirectoryValidator::validate($directory)
                 ->mustExist();
-            $io->writeln('Mocking post...');
-            $io->success(sprintf('Successfully mocked %d posts', $count));
+
+            $this->posts = (new PostWpProvider(
+                count: $this->count,
+                authorCount: $authorCount,
+            ))->generatePosts();
+            if ($dryRun) {
+                $this->dryRun($io, $outFilepath);
+                return Command::SUCCESS;
+            }
+
+            $this->process($io, $outFilepath);
         } catch (\Throwable $e) {
             $this->handlerException->handle($e, $io);
         }
@@ -70,5 +102,42 @@ final class PostWpMockCommand extends BaseWpCommand
         return Command::SUCCESS;
     }
 
-    private function dryRun() {}
+    private function dryRun(SymfonyStyle $io, string $outFilepath): void
+    {
+        $io->title(
+            sprintf("🔍 DRY RUN - Preview Mock Post (%d) items", $this->posts->count())
+        );
+
+        $io->note('No changes to the sytem file, just a preview.');
+        $io->writeln(sprintf('Destination: <fg=green>%s</>', $outFilepath));
+
+        $io->newLine();
+        $io->table(
+            ['No', 'Title', 'Type', 'Status', 'Author', 'Date'],
+            $this->posts->map(function (PostWpDto $post, int $index) {
+                return [
+                    $index + 1,
+                    $post->getTitle(),
+                    $post->getType(),
+                    $post->getStatus(),
+                    $post->getAuthor(),
+                    $post->getDate(),
+                ];
+            })->toArray()
+        );
+
+        $io->success('Dry run done!');
+        $io->info('Use without --dry-run to execute the actual process.');
+    }
+
+    private function process(SymfonyStyle $io, string $outFilepath): void
+    {
+        $io->writeln(sprintf('<fg=yellow>Processing Mocking %d Post ...</>', $this->count));
+
+        if ((bool) File::put($outFilepath, $this->posts->map(fn($t) => $t->toArray())->toJson())) {
+            $io->success(sprintf('Successfully mocked %d posts to %s', $this->count, $outFilepath));
+        } else {
+            $io->error(sprintf("Failed to mock %d posts to %s", $this->count, $outFilepath));
+        }
+    }
 }
