@@ -14,9 +14,7 @@ jobs:
 
       - name: Configure composer auth
         run: |
-          composer config --global https://satis.id \
-            "${{ secrets.SATIS_USER }}" \
-            "${{ secrets.SATIS_PASSWORD }}"
+          composer config --global https://satis.id "${{secrets.SATIS_USER}}" "${{secrets.SATIS_PASSWORD}}"
 
       - run: composer install --no-interaction --prefer-dist
       - run: composer test
