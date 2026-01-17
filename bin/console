@@ -6,6 +6,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
 use Vigihdev\MockForge\Command\Downloader\{LoremFlickrCommand, PicsumCommand, UnsplashCommand, NativeUrlCommand};
+use Vigihdev\MockForge\Command\Mock\Dto\DtoMockCommand;
 use Vigihdev\MockForge\Command\Mock\Wp\{UserWpMockCommand, CategoryWpMockCommand, PostWpMockCommand};
 
 // Env Loader
@@ -21,6 +22,11 @@ $app = new Application();
 $app->add(new UserWpMockCommand());
 $app->add(new CategoryWpMockCommand());
 $app->add(new PostWpMockCommand());
+
+// DTO
+$app->add(new DtoMockCommand());
+
+
 
 // Downloader
 $app->add(new PicsumCommand());

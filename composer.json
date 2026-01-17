@@ -41,7 +41,8 @@
         "vigihdev/support": "dev-main",
         "fightbulc/moment": "^1.35",
         "smknstd/fakerphp-picsum-images": "^1.0",
-        "vigihdev/downloader": "dev-main"
+        "vigihdev/downloader": "dev-main",
+        "phpdocumentor/reflection-docblock": "^5.6"
     },
     "require-dev": {
         "phpunit/phpunit": "10.5.x-dev"
