@@ -5,7 +5,14 @@
 require __DIR__ . '/../vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
+use Vigihdev\MockForge\Command\Downloader\{LoremFlickrCommand, PicsumCommand, UnsplashCommand, NativeUrlCommand};
 use Vigihdev\MockForge\Command\Mock\Wp\{UserWpMockCommand, CategoryWpMockCommand, PostWpMockCommand};
+
+// Env Loader
+$dotEnvPath = __DIR__ . '/../env-path.php';
+if (file_exists($dotEnvPath)) {
+    require $dotEnvPath;
+}
 
 // Application
 $app = new Application();
@@ -14,5 +21,11 @@ $app = new Application();
 $app->add(new UserWpMockCommand());
 $app->add(new CategoryWpMockCommand());
 $app->add(new PostWpMockCommand());
+
+// Downloader
+$app->add(new PicsumCommand());
+$app->add(new LoremFlickrCommand());
+$app->add(new UnsplashCommand());
+$app->add(new NativeUrlCommand());
 
 $app->run();

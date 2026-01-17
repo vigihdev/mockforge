@@ -95,11 +95,11 @@ final class PostWpMockCommand extends BaseWpCommand
             }
 
             $this->process($io, $outFilepath);
+            return Command::SUCCESS;
         } catch (\Throwable $e) {
             $this->handlerException->handle($e, $io);
+            return Command::FAILURE;
         }
-
-        return Command::SUCCESS;
     }
 
     private function dryRun(SymfonyStyle $io, string $outFilepath): void
@@ -108,7 +108,7 @@ final class PostWpMockCommand extends BaseWpCommand
             sprintf("🔍 DRY RUN - Preview Mock Post (%d) items", $this->posts->count())
         );
 
-        $io->note('No changes to the sytem file, just a preview.');
+        $io->note('No changes will be implemented.');
         $io->writeln(sprintf('Destination: <fg=green>%s</>', $outFilepath));
 
         $io->newLine();
