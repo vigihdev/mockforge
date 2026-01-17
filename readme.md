@@ -73,4 +73,6 @@ Proyek ini lahir dari kebutuhan nyata untuk mempercepat workflow development. Sa
 - **FakerPHP**: Mesin utama di balik data tiruan yang realistis.
 - **PHP Community**: Atas inspirasi dan standar kode yang terus berkembang.
 
+---
+
 **Forge with gratitude. Powered by Symfony Console & fakerphp/faker.**
