@@ -26,6 +26,8 @@ Untuk melakukan mock pada DTO kustom Anda:
 php faker mock:dto "Your\Namespace\UserDto" --count=10 --out=test/users.json
 ```
 
+---
+
 ### 🚀 Fitur Utama
 
 - **WordPress Native Mocking**: Generate data untuk Posts, Pages, Users, hingga Custom Post Types secara instan.
@@ -41,8 +43,6 @@ Untuk melakukan mock pada DTO kustom Anda:
 ```bash
 php faker mock:dto "Your\Namespace\UserDto" --count=10 --out=test/users.json
 ```
-
-````
 
 Untuk melihat preview tanpa menyimpan file:
 
@@ -73,5 +73,4 @@ Proyek ini lahir dari kebutuhan nyata untuk mempercepat workflow development. Sa
 - **FakerPHP**: Mesin utama di balik data tiruan yang realistis.
 - **PHP Community**: Atas inspirasi dan standar kode yang terus berkembang.
 
-**"Forge with gratitude. Powered by Symfony Console & fakerphp/faker."**
-````
+**Forge with gratitude. Powered by Symfony Console & fakerphp/faker.**
