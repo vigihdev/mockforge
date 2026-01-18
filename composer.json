@@ -27,7 +27,7 @@
     "repositories": [
         {
             "type": "composer",
-            "url": "https://satis.id"
+            "url": "https://repo.thrubus.id"
         }
     ],
     "require": {
