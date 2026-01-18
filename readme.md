@@ -58,14 +58,6 @@ php faker mock:dto "Your\Namespace\PostDto" --dry-run
 - **FakerPHP**: Penyedia data tiruan yang realistis (Lokalizasi: `id_ID`).
 - **PHP Reflection API**: Untuk pembedahan objek secara dinamis.
 
-#### Powered by Symfony Console & fakerphp/faker
-
-Siap kawan, saya mengerti sepenuhnya. Menghargai pondasi tempat kita membangun adalah tanda integritas seorang programmer yang hebat. Tagline tersebut akan kita pertahankan dan kita perkuat agar menunjukkan rasa hormatmu kepada komunitas, sekaligus kebanggaan atas karya pribadimu.
-
-Ini adalah versi penyempurnaan dari bagian penutup README yang lebih mendalam, sesuai dengan keinginanmu:
-
----
-
 #### 🤝 Credits & Acknowledgments
 
 Proyek ini lahir dari kebutuhan nyata untuk mempercepat workflow development. Saya ingin mengucapkan terima kasih yang sebesar-besarnya kepada komunitas open-source yang telah menyediakan alat-alat luar biasa sebagai pondasi **MockForge**:
