@@ -13,7 +13,7 @@ jobs:
           php-version: "8.1"
 
       - name: Configure private repo auth
-        run: composer config http-basic.satis.id "$SATIS_LOCAL_USER" "$SATIS_LOCAL_TOKEN"
+        run: composer config http-basic.repo.thrubus.id "$SATIS_LOCAL_USER" "$SATIS_LOCAL_TOKEN"
         env:
           SATIS_LOCAL_USER: ${{ secrets.SATIS_LOCAL_USER }}
           SATIS_LOCAL_TOKEN: ${{ secrets.SATIS_LOCAL_TOKEN }}
