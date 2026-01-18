@@ -6,6 +6,7 @@ namespace Vigihdev\MockForge\Contracts;
 
 interface TempFileManagerInterface
 {
+
     /**
      * Get temp directory path.
      * 
