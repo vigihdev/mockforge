@@ -27,7 +27,7 @@
     "repositories": [
         {
             "type": "composer",
-            "url": "https://composer.pkg.github.com/vigihdev"
+            "url": "https://satis.id"
         }
     ],
     "require": {
