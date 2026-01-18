@@ -116,16 +116,14 @@ final class DtoMockGenerator implements MockGeneratorInterface
     {
         // Check custom generator first
         if (isset($this->typeGenerators[$typeName])) {
-            // return $this->typeGenerators[$typeName]($propertyName);
+            return $this->typeGenerators[$typeName]($propertyName);
         }
 
         // Handle class types (untuk nested DTOs)
         if (class_exists($typeName) || interface_exists($typeName)) {
-            // return $this->generateObject($typeName);
+            return $this->generateObject($typeName);
         }
-        var_dump($typeName);
-        var_dump($propertyName);
-        return null;
+
         // Default fallback
         return $this->guessValueFromName($propertyName);
     }
