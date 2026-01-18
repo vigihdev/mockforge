@@ -6,7 +6,7 @@ namespace Vigihdev\MockForge\Command\Downloader;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\{InputInterface, InputOption, InputArgument};
+use Symfony\Component\Console\Input\{InputInterface, InputOption};
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Vigihdev\Downloader\Clients\GuzzleClient;
@@ -15,7 +15,6 @@ use Vigihdev\Downloader\Providers\NativeUrlProvider;
 use Vigihdev\MockForge\Command\Helper\ProgressSpinner;
 use Vigihdev\MockForge\Support\{MockForgeHelper};
 use Vigihdev\MockForge\Validators\{DirectoryValidator, FileValidator};
-use Vigihdev\Support\File;
 
 #[AsCommand(
     name: 'download:image',
