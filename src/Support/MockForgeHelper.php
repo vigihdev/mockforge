@@ -44,14 +44,12 @@ final class MockForgeHelper
 
     public static function findVendorAutoload(): ?string
     {
-
         if (self::findVendorDirFromCwd()) {
             $autoload = Path::join(self::findVendorDirFromCwd(), 'autoload.php');
             if (is_file($autoload)) {
                 return $autoload;
             }
         }
-
         return null;
     }
 
@@ -59,7 +57,7 @@ final class MockForgeHelper
     {
         $currentDir = getcwd();
 
-        // Kita coba memanjat hingga 5 kali ke atas
+        // top directory 5 level
         for ($i = 0; $i < 5; $i++) {
             $vendorPath = Path::join($currentDir, 'vendor');
 
@@ -67,10 +65,10 @@ final class MockForgeHelper
                 return $vendorPath;
             }
 
-            // Naik satu level
+            // go one level up
             $parentDir = dirname($currentDir);
 
-            // Berhenti jika sudah sampai root sistem operasi
+            // stop if reached root system directory
             if ($parentDir === $currentDir) break;
 
             $currentDir = $parentDir;

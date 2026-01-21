@@ -13,7 +13,8 @@ use Vigihdev\Downloader\Clients\GuzzleClient;
 use Vigihdev\Downloader\ImageDownloader;
 use Vigihdev\Downloader\Results\DownloadResult;
 use Vigihdev\Downloader\Providers\PicsumProvider;
-use Vigihdev\MockForge\Support\{MockForgeHelper, TempFileManager};
+use Vigihdev\MockForge\Support\MockForgeHelper;
+use Vigihdev\Support\TempFileManager;
 use Vigihdev\MockForge\Validators\{DirectoryValidator};
 use Vigihdev\Support\Collection;
 

@@ -5,9 +5,11 @@
 require __DIR__ . '/../vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
+use Vigihdev\FakerReflection\AppKernel as ReflectionAppKernel;
 use Vigihdev\MockForge\Command\Downloader\{LoremFlickrCommand, PicsumCommand, UnsplashCommand, NativeUrlCommand};
-use Vigihdev\MockForge\Command\Mock\Dto\DtoMockCommand;
-use Vigihdev\MockForge\Command\Mock\Wp\{UserWpMockCommand, CategoryWpMockCommand, PostWpMockCommand};
+use Vigihdev\MockForge\Command\Mock\{DtoMockCommand};
+
+$basepath = __DIR__ . '/..';
 
 // Env Loader
 $dotEnvPath = __DIR__ . '/../env-path.php';
@@ -15,18 +17,14 @@ if (file_exists($dotEnvPath)) {
     require $dotEnvPath;
 }
 
+// Reflection App Kernel
+$kernel = new ReflectionAppKernel(basepath: $basepath);
+
 // Application
 $app = new Application();
 
-// Block Mock Wp
-$app->add(new UserWpMockCommand());
-$app->add(new CategoryWpMockCommand());
-$app->add(new PostWpMockCommand());
-
 // DTO
 $app->add(new DtoMockCommand());
-
-
 
 // Downloader
 $app->add(new PicsumCommand());

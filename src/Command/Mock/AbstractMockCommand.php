@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Vigihdev\MockForge\Command\Mock\Dto;
+namespace Vigihdev\MockForge\Command\Mock;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Filesystem\Path;
 use Vigihdev\MockForge\Exceptions\Handler\{MockForgeHandlerException, MockForgeHandlerExceptionInterface};
 
-abstract class AbstractDtoCommand extends Command
+abstract class AbstractMockCommand extends Command
 {
 
     protected string $out = '';
@@ -33,7 +33,7 @@ abstract class AbstractDtoCommand extends Command
      *
      * @return string
      */
-    protected function normalizeOutFilepath(string $out): string
+    protected function normalizeOutputpath(string $out): string
     {
         if (Path::isAbsolute($out)) {
             $directory = Path::getDirectory($out);
@@ -43,7 +43,27 @@ abstract class AbstractDtoCommand extends Command
             }
             throw new \RuntimeException(sprintf('Cannot resolve absolute path for %s', $out));
         }
-
         return Path::join(getcwd() ?? '', $out);
+    }
+
+    protected function normalizeItemsTableRow(array $items): array
+    {
+        $itemsRow = [];
+        foreach ($items as $index => $item) {
+            if (is_array($item)) {
+                $data = array_values($item);
+                $data = array_slice($data, 0, 4);
+
+                $data = array_merge([$index + 1], $data);
+                $data = array_map(function ($item) use ($index) {
+                    $item = is_array($item) ? implode(', ', $item) : (string)$item;
+                    $item = substr($item, 0, 40);
+                    return $item;
+                }, $data);
+
+                $itemsRow[] = $data;
+            }
+        }
+        return $itemsRow;
     }
 }

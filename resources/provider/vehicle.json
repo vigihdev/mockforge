@@ -1,0 +1,29 @@
+{
+    "mobils": [
+        "Toyota Avanza Veloz",
+        "Honda Brio Satya",
+        "Suzuki Ertiga",
+        "Daihatsu Xenia",
+        "Mitsubishi Xpander",
+        "Honda CR-V",
+        "Toyota Innova Reborn",
+        "Suzuki Jimny",
+        "Wuling Almaz",
+        "Nissan Livina",
+        "Hyundai Creta",
+        "Kia Seltos",
+        "DFSK Glory 560"
+    ],
+    "paketSewas": [
+        "Harian - 24 Jam (Include Driver)",
+        "Mingguan - 7 Hari Bebas Sopir",
+        "Bulanan - 30 Hari Full Insurance",
+        "Weekend - Jumat-Minggu (Lepas Kunci)",
+        "Lepas Kunci Harian (Self Drive)",
+        "Paket Wisata Surabaya - Malang 3 Hari",
+        "Paket Antar Jemput Bandara Juanda",
+        "Dropoff - Drop satu tujuan",
+        "Pickup - Pickup satu tujuan",
+        "Layanan - Banyak Tujuan"
+    ]
+}

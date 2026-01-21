@@ -6,9 +6,9 @@ namespace Vigihdev\MockForge\Command\Downloader;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Filesystem\Path;
-use Vigihdev\MockForge\Contracts\{TempFileManagerInterface};
 use Vigihdev\MockForge\Exceptions\Handler\{MockForgeHandlerException, MockForgeHandlerExceptionInterface};
-use Vigihdev\MockForge\Support\TempFileManager;
+use Vigihdev\Support\TempFileManager;
+use Vigihdev\Support\Contracts\TempFileManagerInterface;
 
 abstract class AbstractDownloaderCommand extends Command
 {
@@ -21,7 +21,7 @@ abstract class AbstractDownloaderCommand extends Command
     protected ?MockForgeHandlerExceptionInterface $handlerException = null;
 
     /**
-     * @var TempFileManagerInterface $tempManager
+     * @var Te $tempManager
      */
     protected ?TempFileManagerInterface $tempManager = null;
 
