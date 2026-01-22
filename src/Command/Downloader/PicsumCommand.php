@@ -13,10 +13,10 @@ use Vigihdev\Downloader\Clients\GuzzleClient;
 use Vigihdev\Downloader\ImageDownloader;
 use Vigihdev\Downloader\Results\DownloadResult;
 use Vigihdev\Downloader\Providers\PicsumProvider;
+use Vigihdev\MockForge\Exceptions\MockForgeException;
 use Vigihdev\MockForge\Support\MockForgeHelper;
-use Vigihdev\Support\TempFileManager;
-use Vigihdev\MockForge\Validators\{DirectoryValidator};
-use Vigihdev\Support\Collection;
+use Vigihdev\Support\{TempFileManager, Collection};
+use Vigihdev\Validators\{DirectoryValidator};
 
 #[AsCommand(
     name: 'picsum',
@@ -31,7 +31,7 @@ final class PicsumCommand extends AbstractDownloaderCommand
     {
         $this
             ->addOption('count', 'c', InputOption::VALUE_OPTIONAL, 'Number of images to download max (20)', 10)
-            ->addOption('out', 'o', InputOption::VALUE_REQUIRED, 'Out Filepath to save images', null)
+            ->addOption('output', 'o', InputOption::VALUE_REQUIRED, 'Output Filepath to save images', null)
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Dry run', null)
             ->setHelp(
                 <<<'HELP'
@@ -59,7 +59,7 @@ final class PicsumCommand extends AbstractDownloaderCommand
     {
 
         $io = new SymfonyStyle($input, $output);
-        $outpath = $input->getOption('out');
+        $outpath = $input->getOption('output');
         $count = (int) $input->getOption('count');
         $dryRun = $input->getOption('dry-run');
 
@@ -77,7 +77,7 @@ final class PicsumCommand extends AbstractDownloaderCommand
         $outpath = $this->normalizeOutpath($outpath);
         try {
 
-            DirectoryValidator::validate($outpath)
+            DirectoryValidator::validate('output', $outpath)
                 ->mustExist()
                 ->mustBeWritable()
                 ->mustBeReadable();
@@ -90,7 +90,7 @@ final class PicsumCommand extends AbstractDownloaderCommand
             $this->process($io, $outpath);
             return Command::SUCCESS;
         } catch (\Throwable $e) {
-            $this->handlerException->handle($e, $io);
+            MockForgeException::handleThrowableWithIo($e, $io);
             return Command::FAILURE;
         }
     }
@@ -131,6 +131,7 @@ final class PicsumCommand extends AbstractDownloaderCommand
     private function process(SymfonyStyle $io, string $outpath): void
     {
 
+        $io->newLine();
         $io->writeln(sprintf('<fg=yellow>Processing Downloading %d Images ...</>', $this->count));
         $io->writeln(sprintf('Destination: <fg=green>%s</>', $outpath));
         $io->newLine();

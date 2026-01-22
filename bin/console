@@ -2,34 +2,4 @@
 <?php
 // console
 
-require __DIR__ . '/../vendor/autoload.php';
-
-use Symfony\Component\Console\Application;
-use Vigihdev\FakerReflection\AppKernel as ReflectionAppKernel;
-use Vigihdev\MockForge\Command\Downloader\{LoremFlickrCommand, PicsumCommand, UnsplashCommand, NativeUrlCommand};
-use Vigihdev\MockForge\Command\Mock\{DtoMockCommand};
-
-$basepath = __DIR__ . '/..';
-
-// Env Loader
-$dotEnvPath = __DIR__ . '/../env-path.php';
-if (file_exists($dotEnvPath)) {
-    require $dotEnvPath;
-}
-
-// Reflection App Kernel
-$kernel = new ReflectionAppKernel(basepath: $basepath);
-
-// Application
-$app = new Application();
-
-// DTO
-$app->add(new DtoMockCommand());
-
-// Downloader
-$app->add(new PicsumCommand());
-$app->add(new LoremFlickrCommand());
-$app->add(new UnsplashCommand());
-$app->add(new NativeUrlCommand());
-
-$app->run();
+require __DIR__ . '/faker';

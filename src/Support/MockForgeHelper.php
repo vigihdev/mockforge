@@ -26,7 +26,6 @@ final class MockForgeHelper
         return $basename;
     }
 
-
     public static function isFileJson(string $filePath): bool
     {
         return pathinfo($filePath, PATHINFO_EXTENSION) === 'json';

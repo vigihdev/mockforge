@@ -13,8 +13,9 @@ use Vigihdev\Downloader\Clients\GuzzleClient;
 use Vigihdev\Downloader\ImageDownloader;
 use Vigihdev\Downloader\Providers\NativeUrlProvider;
 use Vigihdev\MockForge\Command\Helper\ProgressSpinner;
+use Vigihdev\MockForge\Exceptions\MockForgeException;
 use Vigihdev\MockForge\Support\{MockForgeHelper};
-use Vigihdev\MockForge\Validators\{DirectoryValidator, FileValidator};
+use Vigihdev\Validators\{DirectoryValidator, FileValidator};
 
 #[AsCommand(
     name: 'download:image',
@@ -28,17 +29,18 @@ final class NativeUrlCommand extends AbstractDownloaderCommand
         $this
             ->addOption('file-url', null, InputOption::VALUE_OPTIONAL, 'List url from file path for download image')
             ->addOption('url', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Url to download image')
-            ->addOption('out', 'o', InputOption::VALUE_REQUIRED, 'Out Filepath to save images', null)
+            ->addOption('output', 'o', InputOption::VALUE_REQUIRED, 'Output Filepath to save images', null)
+            ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force override existing file')
             ->setHelp(
                 <<<'HELP'
                      <info>Download image from Url and save to specified path</info>
 
                     <comment>Usage:</comment>
-                    %command.name% <url> --out=./mocks
+                    %command.name% <url> --output=./mocks
 
                     <comment>Example:</comment>
-                    %command.name% https://example.com/image.jpg --out=./mocks
-                    %command.name% https://example.com/image.jpg --out=./mocks --dry-run
+                    %command.name% https://example.com/image.jpg --output=./mocks
+                    %command.name% https://example.com/image.jpg --output=./mocks --dry-run
 
                     <comment>Note:</comment>
                     • Count must be a positive integer
@@ -57,8 +59,9 @@ final class NativeUrlCommand extends AbstractDownloaderCommand
     {
 
         $io = new SymfonyStyle($input, $output);
-        $outpath = $input->getOption('out');
+        $outpath = $input->getOption('output');
         $urls = $input->getOption('url');
+        $force = (bool)$input->getOption('force');
         $fileUrl = $input->getOption('file-url');
 
         $listUrls = [];
@@ -68,8 +71,7 @@ final class NativeUrlCommand extends AbstractDownloaderCommand
         }
 
         if ($fileUrl !== null) {
-            $fileUrl = $this->normalizeOutpath($fileUrl);
-            FileValidator::validate($fileUrl)
+            FileValidator::validate('file-url', $fileUrl)
                 ->mustExist()
                 ->mustBeReadable()
                 ->mustBeExtension('json');
@@ -94,23 +96,24 @@ final class NativeUrlCommand extends AbstractDownloaderCommand
 
         try {
 
-            DirectoryValidator::validate($outpath)
+            DirectoryValidator::validate('output', $outpath)
                 ->mustExist()
                 ->mustBeWritable()
                 ->mustBeReadable();
 
-            $this->process($io, $outpath, $listUrls);
+            $this->process($io, $outpath, $listUrls, (bool)$force);
             return Command::SUCCESS;
         } catch (\Throwable $e) {
-            $this->handlerException->handle($e, $io);
+            MockForgeException::handleThrowableWithIo($e, $io);
             return Command::FAILURE;
         }
     }
 
-    private function process(SymfonyStyle $io, string $outpath, array $urls): void
+    private function process(SymfonyStyle $io, string $outpath, array $urls, bool $force): void
     {
 
         $count = count($urls);
+        $io->newLine();
         $io->writeln(sprintf('<fg=yellow>Processing Downloading %d Images ...</>', $count));
         $io->writeln(sprintf('Destination: <fg=green>%s</>', $outpath));
         $io->newLine();
@@ -128,7 +131,7 @@ final class NativeUrlCommand extends AbstractDownloaderCommand
                 usleep(600000); // 600ms
                 $downloader = new ImageDownloader(
                     client: $client,
-                    provider: new NativeUrlProvider(url: $url, destination: $outpath)
+                    provider: new NativeUrlProvider(url: $url, destination: $outpath, allowOverwrite: $force)
                 );
 
                 $result = $downloader->download();

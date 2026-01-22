@@ -12,6 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Path;
 use Vigihdev\FakerReflection\FakerReflection;
+use Vigihdev\MockForge\Exceptions\MockForgeException;
 use Vigihdev\MockForge\Support\MockForgeHelper;
 use Vigihdev\Validators\{DirectoryValidator, FileValidator};
 use Vigihdev\Support\Collection;
@@ -68,11 +69,11 @@ final class DtoMockCommand extends AbstractMockCommand
         $io = new SymfonyStyle($input, $output);
         $class = $input->getArgument('class');
         $force = $input->getOption('force');
-        $outpath = $input->getOption('output');
+        $outFilepath = $input->getOption('output');
         $count = (int)$input->getOption('count');
         $dryRun = $input->getOption('dry-run');
 
-        if ($outpath === null) {
+        if ($outFilepath === null) {
             $io->error('Output path is required');
             return Command::INVALID;
         }
@@ -89,10 +90,10 @@ final class DtoMockCommand extends AbstractMockCommand
             return Command::FAILURE;
         }
 
-        $outpath = $this->normalizeOutputpath($outpath);
+        $outFilepath = $this->normalizeOutputpath($outFilepath);
         try {
 
-            $fileValidator = FileValidator::validate('output', $outpath)
+            $fileValidator = FileValidator::validate('output', $outFilepath)
                 ->mustHaveExtension()
                 ->mustBeExtension('json');
 
@@ -100,7 +101,7 @@ final class DtoMockCommand extends AbstractMockCommand
                 $fileValidator->mustBeNotExist();
             }
 
-            $directory = Path::getDirectory($outpath);
+            $directory = Path::getDirectory($outFilepath);
             DirectoryValidator::validate('output', $directory)
                 ->mustExist()
                 ->mustBeWritable()
@@ -112,7 +113,7 @@ final class DtoMockCommand extends AbstractMockCommand
             );
             $this->collection = $generator->generate();
 
-            $this->out = $outpath;
+            $this->outFilepath = $outFilepath;
             $this->class = $class;
             if ($dryRun) {
                 $this->dryRun($io);
@@ -123,7 +124,7 @@ final class DtoMockCommand extends AbstractMockCommand
 
             return Command::SUCCESS;
         } catch (\Throwable $e) {
-            $this->handlerException->handle($e, $io);
+            MockForgeException::handleThrowableWithIo($e, $io);
             return Command::FAILURE;
         }
     }
@@ -136,7 +137,7 @@ final class DtoMockCommand extends AbstractMockCommand
 
         $io->note('No changes will be implemented.');
         $io->writeln(
-            sprintf('Destination: <fg=green>%s</>', $this->out)
+            sprintf('Destination: <fg=green>%s</>', $this->outFilepath)
         );
         $io->writeln(
             sprintf('Count: <fg=green>%d</>', $this->collection->count())
@@ -147,9 +148,8 @@ final class DtoMockCommand extends AbstractMockCommand
         $io->newLine();
 
         $headers = array_keys($this->collection->first() ?? []);
-        $headers = array_slice($headers, 0, 4);
-        $itemsRow = $this->normalizeItemsTableRow($this->collection->toArray());
-
+        $headers = array_slice($headers, 0, 3);
+        $itemsRow = $this->normalizeItemsTableRow($this->collection->toArray(), 3);
 
         $io->table(array_merge(['No'], $headers), $itemsRow);
 
@@ -164,22 +164,22 @@ final class DtoMockCommand extends AbstractMockCommand
             sprintf('<fg=yellow>Processing Mocking %s...</>', $this->class)
         );
         $io->writeln(
-            sprintf('Destination: <fg=green>%s</>', $this->out)
+            sprintf('Destination: <fg=green>%s</>', $this->outFilepath)
         );
         $io->writeln(
             sprintf('Count: <fg=green>%d</>', $this->collection->count())
         );
 
-        if ((bool)File::put($this->out, $this->collection->toJson())) {
+        if ((bool)File::put($this->outFilepath, $this->collection->toJson())) {
             $io->success(
-                sprintf("Successfully mocked to %s with %d items", $this->out, $this->collection->count())
+                sprintf("Successfully mocked to %s with %d items", $this->outFilepath, $this->collection->count())
             );
             $io->newLine();
             return;
         }
 
         $io->error(
-            sprintf("Failure mocking to %s", $this->out)
+            sprintf("Failure mocking to %s", $this->outFilepath)
         );
         $io->newLine();
     }

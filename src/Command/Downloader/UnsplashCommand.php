@@ -12,8 +12,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Vigihdev\Downloader\Clients\GuzzleClient;
 use Vigihdev\Downloader\ImageDownloader;
 use Vigihdev\Downloader\Providers\UnsplashProvider;
+use Vigihdev\MockForge\Exceptions\MockForgeException;
 use Vigihdev\MockForge\Support\MockForgeHelper;
-use Vigihdev\MockForge\Validators\{DirectoryValidator};
+use Vigihdev\Validators\{DirectoryValidator};
 
 #[AsCommand(
     name: 'unsplash',
@@ -26,7 +27,7 @@ final class UnsplashCommand extends AbstractDownloaderCommand
     {
         $this
             ->addOption('count', 'c', InputOption::VALUE_OPTIONAL, 'Number of images to download max (10)', 5)
-            ->addOption('out', 'o', InputOption::VALUE_REQUIRED, 'Out Filepath to save images', null)
+            ->addOption('output', 'o', InputOption::VALUE_REQUIRED, 'Output Filepath to save images', null)
             ->setHelp(
                 <<<'HELP'
                     <info>Download Random images from Unsplash</info>
@@ -54,7 +55,7 @@ final class UnsplashCommand extends AbstractDownloaderCommand
     {
 
         $io = new SymfonyStyle($input, $output);
-        $outpath = $input->getOption('out');
+        $outpath = $input->getOption('output');
         $count = (int) $input->getOption('count');
 
         if ($outpath === null) {
@@ -72,7 +73,7 @@ final class UnsplashCommand extends AbstractDownloaderCommand
         $outpath = $this->normalizeOutpath($outpath);
         try {
 
-            DirectoryValidator::validate($outpath)
+            DirectoryValidator::validate('output', $outpath)
                 ->mustExist()
                 ->mustBeWritable()
                 ->mustBeReadable();
@@ -80,7 +81,7 @@ final class UnsplashCommand extends AbstractDownloaderCommand
             $this->process($io, $outpath);
             return Command::SUCCESS;
         } catch (\Throwable $e) {
-            $this->handlerException->handle($e, $io);
+            MockForgeException::handleThrowableWithIo($e, $io);
             return Command::FAILURE;
         }
     }
@@ -88,6 +89,7 @@ final class UnsplashCommand extends AbstractDownloaderCommand
     private function process(SymfonyStyle $io, string $outpath): void
     {
 
+        $io->newLine();
         $io->writeln(sprintf('<fg=yellow>Processing Downloading %d Images ...</>', $this->count));
         $io->writeln(sprintf('Destination: <fg=green>%s</>', $outpath));
         $io->newLine();

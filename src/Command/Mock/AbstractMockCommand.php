@@ -6,26 +6,20 @@ namespace Vigihdev\MockForge\Command\Mock;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Filesystem\Path;
-use Vigihdev\MockForge\Exceptions\Handler\{MockForgeHandlerException, MockForgeHandlerExceptionInterface};
 
 abstract class AbstractMockCommand extends Command
 {
 
-    protected string $out = '';
+    protected string $outFilepath = '';
 
     protected int $count = 0;
 
     protected string $class = '';
 
-    protected ?MockForgeHandlerExceptionInterface $handlerException = null;
 
     public function __construct(?string $name = null)
     {
         parent::__construct($name);
-
-        if ($this->handlerException === null) {
-            $this->handlerException = new MockForgeHandlerException();
-        }
     }
 
     /**
@@ -46,13 +40,13 @@ abstract class AbstractMockCommand extends Command
         return Path::join(getcwd() ?? '', $out);
     }
 
-    protected function normalizeItemsTableRow(array $items): array
+    protected function normalizeItemsTableRow(array $items, int $lengthColumn): array
     {
         $itemsRow = [];
         foreach ($items as $index => $item) {
             if (is_array($item)) {
                 $data = array_values($item);
-                $data = array_slice($data, 0, 4);
+                $data = array_slice($data, 0, $lengthColumn);
 
                 $data = array_merge([$index + 1], $data);
                 $data = array_map(function ($item) use ($index) {

@@ -12,7 +12,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Vigihdev\Downloader\Clients\GuzzleClient;
 use Vigihdev\Downloader\ImageDownloader;
 use Vigihdev\Downloader\Providers\LoremFlickrProvider;
-use Vigihdev\MockForge\Validators\{DirectoryValidator};
+use Vigihdev\MockForge\Exceptions\MockForgeException;
+use Vigihdev\MockForge\Support\MockForgeHelper;
+use Vigihdev\Validators\{DirectoryValidator};
 
 #[AsCommand(
     name: 'lorem:flickr',
@@ -25,7 +27,7 @@ final class LoremFlickrCommand extends AbstractDownloaderCommand
     {
         $this
             ->addOption('count', 'c', InputOption::VALUE_OPTIONAL, 'Number of images to download max (20)', 10)
-            ->addOption('out', 'o', InputOption::VALUE_REQUIRED, 'Out Filepath to save images', null)
+            ->addOption('output', 'o', InputOption::VALUE_REQUIRED, 'Output Filepath to save images', null)
             ->setHelp(
                 <<<'HELP'
                     <info>Download Random images from Lorem Flickr</info>
@@ -53,7 +55,7 @@ final class LoremFlickrCommand extends AbstractDownloaderCommand
     {
 
         $io = new SymfonyStyle($input, $output);
-        $outpath = $input->getOption('out');
+        $outpath = $input->getOption('output');
         $count = (int) $input->getOption('count');
 
         if ($outpath === null) {
@@ -71,7 +73,7 @@ final class LoremFlickrCommand extends AbstractDownloaderCommand
         $outpath = $this->normalizeOutpath($outpath);
         try {
 
-            DirectoryValidator::validate($outpath)
+            DirectoryValidator::validate('output', $outpath)
                 ->mustExist()
                 ->mustBeWritable()
                 ->mustBeReadable();
@@ -79,7 +81,7 @@ final class LoremFlickrCommand extends AbstractDownloaderCommand
             $this->process($io, $outpath);
             return Command::SUCCESS;
         } catch (\Throwable $e) {
-            $this->handlerException->handle($e, $io);
+            MockForgeException::handleThrowableWithIo($e, $io);
             return Command::FAILURE;
         }
     }
@@ -87,6 +89,7 @@ final class LoremFlickrCommand extends AbstractDownloaderCommand
     private function process(SymfonyStyle $io, string $outpath): void
     {
 
+        $io->newLine();
         $io->writeln(sprintf('<fg=yellow>Processing Downloading %d Images ...</>', $this->count));
         $io->writeln(sprintf('Destination: <fg=green>%s</>', $outpath));
         $io->newLine();
@@ -104,8 +107,10 @@ final class LoremFlickrCommand extends AbstractDownloaderCommand
                     provider: new LoremFlickrProvider(destination: $outpath)
                 );
                 $result = $downloader->download();
+                $fileSize = MockForgeHelper::filesizeFormat($result->getSize());
+                $filename = basename($result->getDestination());
                 $progressBar->setMessage(
-                    sprintf('<fg=green> ✔ SUCCESS</> %s', basename($result->getDestination()))
+                    sprintf('<fg=green> ✔ SUCCESS</> %s (<fg=yellow>%s</>)', $filename, $fileSize)
                 );
                 if ($i === 0) {
                     $progressBar->setOverwrite(true);
